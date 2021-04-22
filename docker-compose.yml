@@ -1,0 +1,60 @@
+version: '3.7'
+
+services:
+## WEBSERVICE ################################################
+  webserver-service:
+    container_name: investidor10news_webserver
+    build: .
+    working_dir: /var/www/html/
+    volumes:
+        - ./:/var/www/html
+    environment:
+       - APP_ENV=local
+    entrypoint: [ "/bin/sh", "/usr/local/bin/docker-entrypoint.sh" ]
+    depends_on:
+      - db-service
+    links:
+      - db-service
+    restart: on-failure
+    networks:
+      - investidor10news_network
+
+## MYSQL ################################################
+  db-service:
+    image: mysql
+    container_name: investidor10_db
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=investidor10_root
+      - MYSQL_DATABASE=investidor10db
+      - MYSQL_USER=user_investidor10
+      - MYSQL_PASSWORD=pwd_investidor10
+    ports:
+      - 3306:3305
+    expose:
+      - 3306
+    volumes:
+      - ./database/docker-data/mysql:/var/lib/mysql
+      - ./database/docker-entrypoint-initdb.d
+    networks:
+      - investidor10news_network
+
+## NGINX ################################################
+  webserver-nginx-service:
+    image: nginx:1.17-alpine
+    container_name: investidor10-webserver-nginx
+    working_dir: /var/www/html/
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - '8001:80'
+    depends_on:
+      - webserver-service
+    networks:
+      - investidor10news_network
+
+## NETWORK ################################################
+networks:
+  investidor10news_network:
+    driver: bridge
