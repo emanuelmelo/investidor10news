@@ -31,9 +31,11 @@ services:
       - MYSQL_USER=user_investidor10
       - MYSQL_PASSWORD=pwd_investidor10
     ports:
-      - 3306:3305
+      - 3306:3306
     expose:
       - 3306
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
     volumes:
       - ./database/docker-data/mysql:/var/lib/mysql
       - ./database/docker-entrypoint-initdb.d

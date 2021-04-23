@@ -14,6 +14,7 @@ RUN apt-get update --fix-missing \
     && docker-php-ext-configure zip \
     && docker-php-ext-install zip \
     && docker-php-ext-install mysqli \
+    && docker-php-ext-install pdo_mysql \
     && php -m | grep -q 'zip'
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && chmod +x /usr/local/bin/composer
